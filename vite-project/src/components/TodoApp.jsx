@@ -1,10 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import "./TodoApp.css";
 
 const TodoApp = () => {
   const [todos, setTodos] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
+  // Carregar tarefas salvas no localStorage quando o app iniciar
+  useEffect(() => {
+    const savedTodos = localStorage.getItem("todos");
+    if (savedTodos) {
+      setTodos(JSON.parse(savedTodos));
+    }
+  }, []);
+
+  // Salvar no localStorage sempre que a lista de tarefas mudar
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
+
+  // Adicionar tarefa
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -16,6 +30,12 @@ const TodoApp = () => {
       setTodos((prevTodos) => [...prevTodos, newTodo]);
       setInputValue("");
     }
+  };
+
+  // Remover tarefa
+  const handleDelete = (id) => {
+    const updatedTodos = todos.filter(todo => todo.id !== id);
+    setTodos(updatedTodos);
   };
 
   return (
@@ -38,10 +58,10 @@ const TodoApp = () => {
       <ul className="todo-list">
         {todos.map((todo) => (
           <li key={todo.id} className="todo-item">
-          <span>{todo.text}</span>
-        <div className='button-group'>
-            <button className='edit-button'>Excluir</button>
-            <button className='delete-button'>Excluir</button>
+            <span>{todo.text}</span>
+            <div className="button-group">
+              <button className="edit-button">Editar</button>
+              <button className="delete-button" onClick={() => handleDelete(todo.id)}>Excluir</button>
             </div>
           </li>
         ))}
